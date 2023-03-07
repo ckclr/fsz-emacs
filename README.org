@@ -1,1 +1,4 @@
-# my emacs cfgs
+* fsz-emacs
+
+my emacs configs.
+
