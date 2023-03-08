@@ -4,7 +4,7 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
-   '(which-key vertico use-package rg restart-emacs projectile org-transclusion org-fragtog org-download orderless marginalia expand-region eglot company blacken benchmark-init ace-window)))
+   '(org-bullets which-key vertico use-package tabbar rg restart-emacs projectile org-transclusion org-fragtog org-download orderless marginalia keycast expand-region eglot company centaur-tabs blacken benchmark-init ace-window)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.

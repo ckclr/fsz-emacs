@@ -63,7 +63,7 @@ If FRAME is omitted or nil, use currently selected frame."
       (apply 'set-frame-position (flatten-list (list frame center))))))
 
 ;;让鼠标滚动更好用
-(setq mouse-wheel-scroll-amount '(5 ((shift) . 1) ((control) . nil)))
+(setq mouse-wheel-scroll-amount '(3 ((shift) . 1) ((control) . nil)))
 (setq mouse-wheel-progressive-speed nil)
 
 ;; gui 下才有的设置
@@ -97,15 +97,13 @@ If FRAME is omitted or nil, use currently selected frame."
     (vterm)))
 (global-set-key (kbd "M-g t") 'fsz/term-other-window)
 
-;; 获取当前 file-path:line-number 存到粘贴板
+;; 获取当前 file-path 和 选中的行范围，并存到粘贴板
 (defun fsz/get-file-path-line-number()
   (interactive)
   (kill-new
    (concat
     "#+transclude: [[file:"
     buffer-file-name
-    "::"
-    (number-to-string (line-number-at-pos (mark)))
     "]] :lines "
     (number-to-string (line-number-at-pos (mark)))
     "-"
@@ -317,28 +315,6 @@ If FRAME is omitted or nil, use currently selected frame."
      '(aw-leading-char-face
        ((t (:inherit ace-jump-face-foreground :height 3.0)))))))
 
-
-(custom-theme-set-faces
- 'user
- '(variable-pitch ((t (:family "Sarasa Term Slab SC" :height 110 :weight thin))))
- '(fixed-pitch ((t ( :family "Sarasa Term Slab SC" :height 110)))))
-
-(custom-theme-set-faces
- 'user
- '(org-block ((t (:inherit fixed-pitch))))
- '(org-code ((t (:inherit (shadow fixed-pitch)))))
- '(org-document-info ((t (:foreground "dark orange"))))
- '(org-document-info-keyword ((t (:inherit (shadow fixed-pitch)))))
- '(org-indent ((t (:inherit (org-hide fixed-pitch)))))
- '(org-link ((t (:foreground "royal blue" :underline t))))
- '(org-meta-line ((t (:inherit (font-lock-comment-face fixed-pitch)))))
- '(org-property-value ((t (:inherit fixed-pitch))) t)
- '(org-special-keyword ((t (:inherit (font-lock-comment-face fixed-pitch)))))
- '(org-table ((t (:inherit fixed-pitch :foreground "#83a598"))))
- '(org-tag ((t (:inherit (shadow fixed-pitch) :weight bold :height 0.8))))
- '(org-verbatim ((t (:inherit (shadow fixed-pitch))))))
-
-
 ;; (use-package good-scroll
 ;;   :ensure t
 ;;   :config
@@ -376,161 +352,45 @@ If FRAME is omitted or nil, use currently selected frame."
   (setq file-name-coding-system 'gb18030) ; 设置文件名的编码为gb18030
   )
 
-;;org-export latex
-(setq org-alphabetical-lists t)
-  ;;(setq org-latex-to-pdf-process (list "latexmk -pdf %f"))
-  ;;(require 'ox-bibtex)
-(setq org-latex-pdf-process
-	'("xelatex -interaction nonstopmode %f"
-	  "bibtex %b"
-	  "xelatex -interaction nonstopmode %f"
-	  "xelatex -interaction nonstopmode %f"
-	  "rm -fr %b.out %b.log %b.tex %b.brf %b.bbl auto"
-	  ))
-(setq org-latex-compiler "xelatex")
-(require 'ox-latex)
-(add-to-list 'org-latex-classes
-	       '("org-dissertation"
-		 "\\documentclass[UTF8,twoside,a4paper,12pt,openright]{ctexrep}
-                \\setcounter{secnumdepth}{4}
-                \\usepackage[linkcolor=blue,citecolor=blue,backref=page]{hyperref}
-                \\hypersetup{hidelinks}
-                \\usepackage{xeCJK}
-                \\usepackage{fontspec}
-                \\setCJKmainfont{Sarasa Term Slab SC}
-                \\setCJKmonofont{Sarasa Term Slab SC}
-                \\setmainfont{Sarasa Term Slab SC}
-                \\usepackage[namelimits]{amsmath}
-                \\usepackage{amssymb}
-                \\usepackage{mathrsfs}
-                \\newcommand{\\chuhao}{\\fontsize{42.2pt}{\\baselineskip}\\selectfont}
-                \\newcommand{\\xiaochu}{\\fontsize{36.1pt}{\\baselineskip}\\selectfont}
-                \\newcommand{\\yihao}{\\fontsize{26.1pt}{\\baselineskip}\\selectfont}
-                \\newcommand{\\xiaoyi}{\\fontsize{24.1pt}{\\baselineskip}\\selectfont}
-                \\newcommand{\\erhao}{\\fontsize{22.1pt}{\\baselineskip}\\selectfont}
-                \\newcommand{\\xiaoer}{\\fontsize{18.1pt}{\\baselineskip}\\selectfont}
-                \\newcommand{\\sanhao}{\\fontsize{16.1pt}{\\baselineskip}\\selectfont}
-                \\newcommand{\\xiaosan}{\\fontsize{15.1pt}{\\baselineskip}\\selectfont}
-                \\newcommand{\\sihao}{\\fontsize{14.1pt}{\\baselineskip}\\selectfont}
-                \\newcommand{\\xiaosi}{\\fontsize{12.1pt}{\\baselineskip}\\selectfont}
-                \\newcommand{\\wuhao}{\\fontsize{10.5pt}{\\baselineskip}\\selectfont}
-                \\newcommand{\\xiaowu}{\\fontsize{9.0pt}{\\baselineskip}\\selectfont}
-                \\newcommand{\\liuhao}{\\fontsize{7.5pt}{\\baselineskip}\\selectfont}
-                \\newcommand{\\xiaoliu}{\\fontsize{6.5pt}{\\baselineskip}\\selectfont}
-                \\newcommand{\\qihao}{\\fontsize{5.5pt}{\\baselineskip}\\selectfont}
-                \\newcommand{\\bahao}{\\fontsize{5.0pt}{\\baselineskip}\\selectfont}
-                \\usepackage{color}
-                \\usepackage{geometry}
-                \\geometry{top=2cm,bottom=2cm,right=2cm,left=2.5cm}
-                \\geometry{headsep=0.5cm}
-                \\usepackage{setspace}
-                \\setlength{\\baselineskip}{22pt}
-                \\setlength{\\parskip}{0pt}
-                \\usepackage{enumerate}
-                \\usepackage{enumitem}
-                \\setenumerate[1]{itemsep=0pt,partopsep=0pt,parsep=\\parskip,topsep=5pt}
-                \\setitemize[1]{itemsep=0pt,partopsep=0pt,parsep=\\parskip,topsep=5pt}
-                \\setdescription{itemsep=0pt,partopsep=0pt,parsep=\\parskip,topsep=5pt}
-                \\usepackage{fancyhdr}
-	              \\pagestyle{fancy}
-	              \\fancyhead{}
-	              \\fancyhead[CE]{\\wuhao xxxx}
-	              \\fancyhead[CO]{\\wuhao xxxxxx}
-	              \\fancypagestyle{plain}{\\pagestyle{fancy}}
-                \\ctexset{contentsname=\\heiti{目{\\quad}录}}
-                \\ctexset{section={format=\\raggedright}}
-                \\usepackage{titlesec}
-	              \\titleformat{\\chapter}[block]{\\normalfont\\xiaoer\\bfseries\\centering\\heiti}{第{\\zhnumber{\\thechapter}}章}{10pt}{\\xiaoer}
-	              \\titleformat{\\section}[block]{\\normalfont\\xiaosan\\bfseries\\heiti}{\\thesection}{10pt}{\\xiaosan}
-	              \\titleformat{\\subsection}[block]{\\normalfont\\sihao\\bfseries\\heiti}{\\thesubsection}{10pt}{\\sihao}
-	              \\titleformat{\\subsubsection}[block]{\\normalfont\\sihao\\bfseries\\heiti}{\\thesubsubsection}{10pt}{\\sihao}
-	              \\titlespacing{\\chapter} {0pt}{-22pt}{0pt}{}
-	              \\titlespacing{\\section} {0pt}{0pt}{0pt}
-	              \\titlespacing{\\subsection} {0pt}{0pt}{0pt}
-	              \\titlespacing{\\subsubsection} {0pt}{0pt}{0pt}
-                \\usepackage[super,square,numbers,sort&compress]{natbib}
-                \\usepackage{graphicx}
-                \\usepackage{subfigure}
-                \\usepackage{caption}
-                \\captionsetup{font={small}}
-                [NO-DEFAULT-PACKAGES]
-                [NO-PACKAGES]
-                [EXTRA]"
-                ("\\chapter{%s}" . "\\chapter*{%s}")
-                ("\\section{%s}" . "\\section*{%s}")
-                ("\\subsection{%s}" . "\\subsection*{%s}")
-                ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
-                ("\\paragraph{%s}" . "\\paragraph*{%s}")
-                ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
-(add-to-list 'org-latex-classes
-	       '("org-article"
-		 "\\documentclass[UTF8,twoside,a4paper,12pt,openright]{ctexart}
-                \\setcounter{secnumdepth}{4}
-                \\usepackage[linkcolor=blue,citecolor=blue,backref=page]{hyperref}
-                \\hypersetup{hidelinks}
-                \\usepackage{xeCJK}
-                \\usepackage{fontspec}
-                \\setCJKmainfont{Sarasa Term Slab SC}
-                \\setCJKmonofont{Sarasa Term Slab SC}
-                \\setmainfont{Sarasa Term Slab SC}
-                \\usepackage[namelimits]{amsmath}
-                \\usepackage{amssymb}
-                \\usepackage{mathrsfs}
-                \\newcommand{\\chuhao}{\\fontsize{42.2pt}{\\baselineskip}\\selectfont}
-                \\newcommand{\\xiaochu}{\\fontsize{36.1pt}{\\baselineskip}\\selectfont}
-                \\newcommand{\\yihao}{\\fontsize{26.1pt}{\\baselineskip}\\selectfont}
-                \\newcommand{\\xiaoyi}{\\fontsize{24.1pt}{\\baselineskip}\\selectfont}
-                \\newcommand{\\erhao}{\\fontsize{22.1pt}{\\baselineskip}\\selectfont}
-                \\newcommand{\\xiaoer}{\\fontsize{18.1pt}{\\baselineskip}\\selectfont}
-                \\newcommand{\\sanhao}{\\fontsize{16.1pt}{\\baselineskip}\\selectfont}
-                \\newcommand{\\xiaosan}{\\fontsize{15.1pt}{\\baselineskip}\\selectfont}
-                \\newcommand{\\sihao}{\\fontsize{14.1pt}{\\baselineskip}\\selectfont}
-                \\newcommand{\\xiaosi}{\\fontsize{12.1pt}{\\baselineskip}\\selectfont}
-                \\newcommand{\\wuhao}{\\fontsize{10.5pt}{\\baselineskip}\\selectfont}
-                \\newcommand{\\xiaowu}{\\fontsize{9.0pt}{\\baselineskip}\\selectfont}
-                \\newcommand{\\liuhao}{\\fontsize{7.5pt}{\\baselineskip}\\selectfont}
-                \\newcommand{\\xiaoliu}{\\fontsize{6.5pt}{\\baselineskip}\\selectfont}
-                \\newcommand{\\qihao}{\\fontsize{5.5pt}{\\baselineskip}\\selectfont}
-                \\newcommand{\\bahao}{\\fontsize{5.0pt}{\\baselineskip}\\selectfont}
-                \\usepackage{color}
-                \\usepackage{geometry}
-                \\geometry{top=2cm,bottom=2cm,right=2cm,left=2.5cm}
-                \\geometry{headsep=0.5cm}
-                \\usepackage{setspace}
-                \\setlength{\\baselineskip}{22pt}
-                \\setlength{\\parskip}{0pt}
-                \\usepackage{enumerate}
-                \\usepackage{enumitem}
-                \\setenumerate[1]{itemsep=0pt,partopsep=0pt,parsep=\\parskip,topsep=5pt}
-                \\setitemize[1]{itemsep=0pt,partopsep=0pt,parsep=\\parskip,topsep=5pt}
-                \\setdescription{itemsep=0pt,partopsep=0pt,parsep=\\parskip,topsep=5pt}
-                \\usepackage{fancyhdr}
-	              \\pagestyle{fancy}
-	              \\fancyhead{}
-	              \\fancyhead[CE]{\\wuhao xxxxx}
-	              \\fancyhead[CO]{\\wuhao xxxx}
-	              \\fancypagestyle{plain}{\\pagestyle{fancy}}
-                \\ctexset{contentsname=\\heiti{目{\\quad}录}}
-                \\ctexset{section={format=\\raggedright}}
-                \\usepackage{titlesec}
-	              %\\titleformat{\\chapter}[block]{\\normalfont\\xiaoer\\bfseries\\centering\\heiti}{第{\\zhnumber{\\thechapter}}章}{10pt}{\\xiaoer}
-	              \\titleformat{\\section}[block]{\\normalfont\\xiaosan\\bfseries\\heiti}{\\thesection}{10pt}{\\xiaosan}
-	              \\titleformat{\\subsection}[block]{\\normalfont\\sihao\\bfseries\\heiti}{\\thesubsection}{10pt}{\\sihao}
-	              \\titleformat{\\subsubsection}[block]{\\normalfont\\sihao\\bfseries\\heiti}{\\thesubsubsection}{10pt}{\\sihao}
-	              %\\titlespacing{\\chapter} {0pt}{-22pt}{0pt}{}
-	              \\titlespacing{\\section} {0pt}{0pt}{0pt}
-	              \\titlespacing{\\subsection} {0pt}{0pt}{0pt}
-	              \\titlespacing{\\subsubsection} {0pt}{0pt}{0pt}
-                \\usepackage[super,square,numbers,sort&compress]{natbib}
-                \\usepackage{graphicx}
-                \\usepackage{subfigure}
-                \\usepackage{caption}
-                \\captionsetup{font={small}}
-                [NO-DEFAULT-PACKAGES]
-                [NO-PACKAGES]
-                [EXTRA]"
-                ("\\section{%s}" . "\\section*{%s}")
-                ("\\subsection{%s}" . "\\subsection*{%s}")
-                ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
-                ("\\paragraph{%s}" . "\\paragraph*{%s}")
-                ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
+;; (add-to-list 'load-path "~/.emacs.d/site-lisp/emacs-application-framework/")
+;; (require 'eaf)
+;; (require 'eaf-pdf-viewer)
+
+
+;; ----------------------------------------------------------------
+;; org-mode 配置
+;; ----------------------------------------------------------------
+;; 隐藏重点标记符号
+;; (setq org-hide-emphasis-markers nil)
+;; (use-package org-bullets
+;;   :ensure t
+;;   :config
+;;   (add-hook 'org-mode-hook (lambda () (org-bullets-mode t))))
+
+;; 设置各个 heading 的字体字号
+(let* ((base-font-color (face-foreground 'default nil 'default))
+       (headline '(:inherit default :weight bold :foreground ,base-font-color)))
+  (custom-theme-set-faces
+   'user
+   '(org-level-8 ((t (,@headline :default))))
+   '(org-level-7 ((t (,@headline :default))))
+   '(org-level-6 ((t (,@headline :default))))
+   '(org-level-5 ((t (,@headline :default))))
+   '(org-level-4 ((t (,@headline :default :height 1.1))))
+   '(org-level-3 ((t (,@headline :default :height 1.25))))
+   '(org-level-2 ((t (,@headline :default :height 1.5))))
+   '(org-level-1 ((t (,@headline :default :height 1.75))))
+   '(org-document-title ((t (,@headline ,@variable-tuple :height 2.0 :underline nil))))))
+
+(custom-theme-set-faces
+ 'user
+ '(org-block ((t (:inherit :default))))
+ '(org-block-begin-line ((t (:inherit :default))))
+ '(org-block-end-line ((t (:inherit :default))))
+ '(org-code ((t (:inherit :default))))
+ '(org-property-value ((t (:inherit :default))))
+ '(org-special-keyword ((t (:inherit :default))))
+ '(org-meta-line ((t (:inherit :default)))))
+
+;; 太宽的行会在下一行显示，不再戳到右边看不见了
+(add-hook 'org-mode-hook 'visual-line-mode)
