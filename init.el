@@ -3,9 +3,7 @@
 ;; (add-to-list 'load-path "~/.emacs.d/site-lisp/")
 
 (setq package-user-dir "~/elpa.fsz")
-
 (setq custom-file (locate-user-emacs-file "custom.el"))
-;; 禁用启动界面
 (setq inhibit-startup-message t)
 
 ;; 启动时宽高
@@ -21,7 +19,7 @@
 (setq column-number-mode t)
 
 ;; 高亮当前行
-;; (global-hl-line-mode t)
+(global-hl-line-mode t)
 
 ;; 设置 tab 宽度
 (setq-default tab-width 10)
@@ -63,7 +61,7 @@ If FRAME is omitted or nil, use currently selected frame."
       (apply 'set-frame-position (flatten-list (list frame center))))))
 
 ;;让鼠标滚动更好用
-(setq mouse-wheel-scroll-amount '(3 ((shift) . 1) ((control) . nil)))
+(setq mouse-wheel-scroll-amount '(1 ((shift) . 1) ((control) . nil)))
 (setq mouse-wheel-progressive-speed nil)
 
 ;; gui 下才有的设置
@@ -74,8 +72,12 @@ If FRAME is omitted or nil, use currently selected frame."
       (tool-bar-mode 0)
       (add-hook 'after-init-hook #'fsz/frame-recenter)
       (add-hook 'after-make-frame-functions #'fsz/frame-recenter)
-      (set-frame-font "Sarasa Term Slab SC 11" nil t)
-      (load-theme 'modus-operandi t)))
+      (load-theme 'modus-operandi t)
+      (if (>= (display-pixel-height) 1440)
+	(set-frame-font "Sarasa Term Slab SC 11" nil t) ;; 2k 用 11 号
+        (set-frame-font "Sarasa Term Slab SC 12" nil t)))) ;; 1080p 用 12 号
+
+
 
 ;; open init.el
 ;; global-set-key expects an interactive command. ref: https://stackoverflow.com/q/1250846
@@ -177,10 +179,6 @@ If FRAME is omitted or nil, use currently selected frame."
   :config
   (which-key-mode))
 
-;; (use-package tabbar
-;;   :ensure t
-;;   :config (tabbar-mode 1))
-
 (use-package company
   :ensure t
   :init
@@ -209,6 +207,7 @@ If FRAME is omitted or nil, use currently selected frame."
   (add-to-list 'eglot-server-programs '((c++-mode c-mode) "clangd"))
   (add-to-list 'eglot-server-programs '(python-mode . ("pyright-langserver" "--stdio"))))
 
+;; TODO 只在 python mode 下开启 key bingding
 (use-package blacken
   :ensure t
   :config
@@ -241,37 +240,14 @@ If FRAME is omitted or nil, use currently selected frame."
 ;;   :init
 ;;   (evil-mode t))
 
-(use-package org-download
-  :ensure t)
-
-;; (use-package centaur-tabs
-;;   :ensure t
-;;   :demand
-;;   :config
-;;   (centaur-tabs-mode t)
-;;   :bind
-;;   ("C-<prior>" . centaur-tabs-backward)
-;;   ("C-<next>" . centaur-tabs-forward))
-
-;; (use-package keycast
-;;   :ensure t
-;;   :config
-;;   (keycast-log-mode t))
-
 ;; load theme
 ;; (use-package zenburn-theme :ensure t)
 ;; (load-theme 'modus-vivendi t)
 ;; (load-theme 'modus-operandi t)
 ;; (load-theme 'zenburn t)
 
-;; (setq org-startup-with-inline-images t)
 
 
-;; (use-package org-noter
-;;   :ensure t)
-
-;; (use-package pdf-tools
-;;   :ensure t)
 
 (use-package projectile
   :ensure t
@@ -280,31 +256,15 @@ If FRAME is omitted or nil, use currently selected frame."
   :bind
   ("C-c p" . projectile-command-map))
 
-;; (use-package beacon
-;;   :ensure t
-;;   :config
-;;   (beacon-mode t))
+(use-package beacon
+  :ensure t
+  :config
+  (beacon-mode t))
 
 (use-package rg
   :defer t
   :ensure t)
 
-(setq org-image-actual-width (list 1024))
-(setq org-startup-with-inline-images t)
-(add-hook 'org-mode-hook #'turn-on-font-lock)
-
-;; (use-package org-fragtog
-;;   :ensure t
-;;   :init
-;;   (add-hook 'org-mode-hook 'org-fragtog-mode)
-;;   (setq org-format-latex-options (plist-put org-format-latex-options :scale 1.5))
-;;   (setq org-src-fontify-natively t))
-
-(use-package org-transclusion
-  :ensure t
-  :defer t)
-(define-key global-map (kbd "<f12>") #'org-transclusion-add)
-(define-key global-map (kbd "C-c n t") #'org-transclusion-mode)
 
 (use-package ace-window
   :ensure t
@@ -362,35 +322,61 @@ If FRAME is omitted or nil, use currently selected frame."
 ;; ----------------------------------------------------------------
 ;; 隐藏重点标记符号
 ;; (setq org-hide-emphasis-markers nil)
-;; (use-package org-bullets
-;;   :ensure t
-;;   :config
-;;   (add-hook 'org-mode-hook (lambda () (org-bullets-mode t))))
 
-;; 设置各个 heading 的字体字号
-(let* ((base-font-color (face-foreground 'default nil 'default))
-       (headline '(:inherit default :weight bold :foreground ,base-font-color)))
-  (custom-theme-set-faces
-   'user
-   '(org-level-8 ((t (,@headline :default))))
-   '(org-level-7 ((t (,@headline :default))))
-   '(org-level-6 ((t (,@headline :default))))
-   '(org-level-5 ((t (,@headline :default))))
-   '(org-level-4 ((t (,@headline :default :height 1.1))))
-   '(org-level-3 ((t (,@headline :default :height 1.25))))
-   '(org-level-2 ((t (,@headline :default :height 1.5))))
-   '(org-level-1 ((t (,@headline :default :height 1.75))))
-   '(org-document-title ((t (,@headline ,@variable-tuple :height 2.0 :underline nil))))))
+(use-package org-bullets
+  :ensure t
+  :config
+  (add-hook 'org-mode-hook (lambda () (org-bullets-mode t))))
 
 (custom-theme-set-faces
  'user
+ '(org-level-3 ((t (:inherit :default :height 1.1))))
+ '(org-level-2 ((t (:inherit :default :height 1.2))))
+ '(org-level-1 ((t (:inherit :default :height 1.3))))
  '(org-block ((t (:inherit :default))))
  '(org-block-begin-line ((t (:inherit :default))))
  '(org-block-end-line ((t (:inherit :default))))
  '(org-code ((t (:inherit :default))))
  '(org-property-value ((t (:inherit :default))))
  '(org-special-keyword ((t (:inherit :default))))
- '(org-meta-line ((t (:inherit :default)))))
+ '(org-meta-line ((t (:inherit :default))))
+ '(org-drawer ((t (:inherit :default)))))
 
 ;; 太宽的行会在下一行显示，不再戳到右边看不见了
 (add-hook 'org-mode-hook 'visual-line-mode)
+
+;; (setq org-image-actual-width (list 1024))
+(setq org-startup-with-inline-images t)
+(add-hook 'org-mode-hook #'turn-on-font-lock)
+;; heading 和 content 做视觉上的缩进，实际内容没影响
+(add-hook 'org-mode-hook 'org-indent-mode)
+
+(use-package org-download
+  :ensure t)
+
+(use-package org-noter
+  :ensure t)
+
+(use-package pdf-tools
+  :ensure t)
+
+(use-package org-fragtog
+  :ensure t
+  :init
+  (add-hook 'org-mode-hook 'org-fragtog-mode)
+  (setq org-format-latex-options (plist-put org-format-latex-options :scale 1.5))
+  (setq org-src-fontify-natively t))
+
+(use-package org-transclusion
+  :ensure t
+  :defer t)
+(define-key global-map (kbd "<f12>") #'org-transclusion-add)
+(define-key global-map (kbd "C-c n t") #'org-transclusion-mode)
+(define-key global-map (kbd "C-c n a") #'org-transclusion-add-all)
+(define-key global-map (kbd "C-c n r") #'org-transclusion-remove-all)
+
+(add-to-list 'load-path "~/.emacs.d/site-lisp/org-inline-image-fix/")
+(with-eval-after-load "org"
+  (require 'org-limit-image-size)
+  (org-limit-image-size-activate)
+  (setq org-limit-image-size '((/ (display-pixel-width) 2) . (/ (display-pixel-height) 2))))
