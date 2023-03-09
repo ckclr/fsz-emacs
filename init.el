@@ -380,3 +380,4 @@ If FRAME is omitted or nil, use currently selected frame."
   (require 'org-limit-image-size)
   (org-limit-image-size-activate)
   (setq org-limit-image-size '((/ (display-pixel-width) 2) . (/ (display-pixel-height) 2))))
+(setq org-startup-folded 'show2levels)
