@@ -5,9 +5,6 @@ projectile-bookmarks.eld
 auto-save-list/
 server/
 transient/
-site-lisp/
 eshell/
-
-
-.netrwhist
-coc-settings.json
+*.elc
+*.html

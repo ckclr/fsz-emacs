@@ -2,6 +2,7 @@
 (add-to-list 'native-comp-eln-load-path "~/eln-cache")
 ;; (add-to-list 'load-path "~/.emacs.d/site-lisp/")
 
+
 (setq package-user-dir "~/elpa.fsz")
 (setq custom-file (locate-user-emacs-file "custom.el"))
 (setq inhibit-startup-message t)
@@ -100,7 +101,7 @@ If FRAME is omitted or nil, use currently selected frame."
 (global-set-key (kbd "M-g t") 'fsz/term-other-window)
 
 ;; 获取当前 file-path 和 选中的行范围，并存到粘贴板
-(defun fsz/get-file-path-line-number()
+(defun fsz/get-org-transclusion()
   (interactive)
   (kill-new
    (concat
@@ -112,7 +113,19 @@ If FRAME is omitted or nil, use currently selected frame."
     (number-to-string (line-number-at-pos (point)))
     " :src cpp"))
   (deactivate-mark))
-(global-set-key (kbd "M-g l") 'fsz/get-file-path-line-number)
+(global-set-key (kbd "M-g o t") 'fsz/get-org-transclusion)
+
+(defun fsz/get-file-path-line-number()
+  (interactive)
+  (kill-new
+   (concat
+    "[[file:"
+    buffer-file-name
+    "::"
+    (number-to-string (line-number-at-pos (point)))
+    "]]")
+   (deactivate-mark)))
+(global-set-key (kbd "M-g f l") 'fsz/get-file-path-line-number)
 
 ;; 开启 narrow 功能
 (put 'narrow-to-region 'disabled nil)
@@ -340,7 +353,8 @@ If FRAME is omitted or nil, use currently selected frame."
  '(org-property-value ((t (:inherit :default))))
  '(org-special-keyword ((t (:inherit :default))))
  '(org-meta-line ((t (:inherit :default))))
- '(org-drawer ((t (:inherit :default)))))
+ '(org-drawer ((t (:inherit :default))))
+ '(org-table ((t (:inherit :default)))))
 
 ;; 太宽的行会在下一行显示，不再戳到右边看不见了
 (add-hook 'org-mode-hook 'visual-line-mode)
@@ -351,14 +365,20 @@ If FRAME is omitted or nil, use currently selected frame."
 ;; heading 和 content 做视觉上的缩进，实际内容没影响
 (add-hook 'org-mode-hook 'org-indent-mode)
 
-(use-package org-download
-  :ensure t)
-
-(use-package org-noter
-  :ensure t)
+(use-package async :ensure t)
+(add-to-list 'load-path "~/.emacs.d/site-lisp/org-download/")
+(require 'org-download)
+(setq-default org-download-image-dir "d:/fsz-org/assets")
 
 (use-package pdf-tools
-  :ensure t)
+  :ensure t
+  :init
+  (pdf-loader-install)) ;; 这句关键，没有的话 windows 默认依然用 docview
+(add-hook 'pdf-view-mode-hook (lambda () (display-line-numbers-mode -1)))
+;; (use-package pdf-view-mode
+;;   :bind
+;;   ("C-c C-w" . pdf-view-kill-rmn-ring-save))
+
 
 (use-package org-fragtog
   :ensure t
@@ -367,9 +387,8 @@ If FRAME is omitted or nil, use currently selected frame."
   (setq org-format-latex-options (plist-put org-format-latex-options :scale 1.5))
   (setq org-src-fontify-natively t))
 
-(use-package org-transclusion
-  :ensure t
-  :defer t)
+
+(use-package org-transclusion :ensure t :defer t)
 (define-key global-map (kbd "<f12>") #'org-transclusion-add)
 (define-key global-map (kbd "C-c n t") #'org-transclusion-mode)
 (define-key global-map (kbd "C-c n a") #'org-transclusion-add-all)
@@ -378,8 +397,42 @@ If FRAME is omitted or nil, use currently selected frame."
 (add-to-list 'load-path "~/.emacs.d/site-lisp/org-inline-image-fix/")
 (with-eval-after-load "org"
   (require 'org-limit-image-size)
-  (org-limit-image-size-activate)
-  (setq org-limit-image-size '((/ (display-pixel-width) 2) . (/ (display-pixel-height) 2))))
-(setq org-startup-folded 'show2levels)
+  (org-limit-image-size-activate))
+;; (setq org-limit-image-size '((/ (display-pixel-width) 2) . (/ (display-pixel-height) 2)))
+(setq org-limit-image-size '(0.7 . 0.7))
+
+(setq org-startup-folded t)
 
 (setq org-preview-latex-image-directory "~/ltximg/")
+
+;; (add-to-list 'load-path "~/.emacs.d/site-lisp/interleave")
+;; (require 'interleave)
+
+(add-to-list 'load-path "~/.emacs.d/site-lisp/org-noter-plus/")
+(add-to-list 'load-path "~/.emacs.d/site-lisp/org-noter-plus/modules/")
+(add-to-list 'load-path "~/.emacs.d/site-lisp/org-noter-plus/other/")
+(require 'org-noter)
+(require 'org-noter-pdf)
+(require 'org-noter-dynamic-block)
+(with-eval-after-load 'org-noter
+  (setq org-noter-arrow-background-color "cyan"
+        org-noter-arrow-foreground-color "black"))
+(with-eval-after-load 'org-noter
+  (define-key org-noter-doc-mode-map (kbd "i")   'org-noter-insert-precise-note)
+  (define-key org-noter-doc-mode-map (kbd "C-i") 'org-noter-insert-note)
+  (define-key org-noter-doc-mode-map (kbd "I")   'org-noter-insert-precise-note-toggle-no-questions)
+  (define-key org-noter-doc-mode-map (kbd "M-i") 'org-noter-insert-note-toggle-no-questions))
+(with-eval-after-load 'org-noter
+  (define-key org-noter-doc-mode-map (kbd "M-p") 'org-noter-sync-prev-note)
+  (define-key org-noter-doc-mode-map (kbd "M-.") 'org-noter-sync-current-note)
+  (define-key org-noter-doc-mode-map (kbd "M-n") 'org-noter-sync-next-note)
+  (define-key org-noter-doc-mode-map (kbd "C-M-p") 'org-noter-sync-prev-page-or-chapter)
+  (define-key org-noter-doc-mode-map (kbd "C-M-.") 'org-noter-sync-current-page-or-chapter)
+  (define-key org-noter-doc-mode-map (kbd "C-M-n") 'org-noter-sync-next-page-or-chapter)
+
+  (define-key org-noter-notes-mode-map (kbd "M-p") 'org-noter-sync-prev-note)
+  (define-key org-noter-notes-mode-map (kbd "M-.") 'org-noter-sync-current-note)
+  (define-key org-noter-notes-mode-map (kbd "M-n") 'org-noter-sync-next-note)
+  (define-key org-noter-notes-mode-map (kbd "C-M-p") 'org-noter-sync-prev-page-or-chapter)
+  (define-key org-noter-notes-mode-map (kbd "C-M-.") 'org-noter-sync-current-page-or-chapter)
+  (define-key org-noter-notes-mode-map (kbd "C-M-n") 'org-noter-sync-next-page-or-chapter))

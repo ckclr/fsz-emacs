@@ -3,7 +3,8 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(org-limit-image-size '(800 . 900)))
+ '(org-noter-arrow-background-color "cyan")
+ '(org-noter-arrow-foreground-color "black"))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -20,4 +21,5 @@
  '(org-level-3 ((t (:inherit :default :height 1.1))))
  '(org-meta-line ((t (:inherit :default))))
  '(org-property-value ((t (:inherit :default))) t)
- '(org-special-keyword ((t (:inherit :default)))))
+ '(org-special-keyword ((t (:inherit :default))))
+ '(org-table ((t (:inherit :default)))))
