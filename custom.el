@@ -3,8 +3,8 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(org-noter-arrow-background-color "cyan")
- '(org-noter-arrow-foreground-color "black"))
+ '(package-selected-packages
+   '(org-journal which-key vertico use-package rg restart-emacs projectile pdf-tools org-transclusion org-roam org-fragtog org-bullets orderless marginalia expand-region eglot company blacken benchmark-init beacon async ace-window)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.

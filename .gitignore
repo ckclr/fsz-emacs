@@ -8,3 +8,5 @@ transient/
 eshell/
 *.elc
 *.html
+org-roam.db
+bookmarks

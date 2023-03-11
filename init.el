@@ -354,6 +354,9 @@ If FRAME is omitted or nil, use currently selected frame."
  '(org-special-keyword ((t (:inherit :default))))
  '(org-meta-line ((t (:inherit :default))))
  '(org-drawer ((t (:inherit :default))))
+ '(org-document-title ((t (:inherit :default))))
+ '(org-document-info ((t (:inherit :default))))
+ '(org-document-info-keyword ((t (:inherit :default))))
  '(org-table ((t (:inherit :default)))))
 
 ;; 太宽的行会在下一行显示，不再戳到右边看不见了
@@ -401,7 +404,7 @@ If FRAME is omitted or nil, use currently selected frame."
 ;; (setq org-limit-image-size '((/ (display-pixel-width) 2) . (/ (display-pixel-height) 2)))
 (setq org-limit-image-size '(0.7 . 0.7))
 
-(setq org-startup-folded t)
+(setq org-startup-folded 'show2levels)
 
 (setq org-preview-latex-image-directory "~/ltximg/")
 
@@ -436,3 +439,42 @@ If FRAME is omitted or nil, use currently selected frame."
   (define-key org-noter-notes-mode-map (kbd "C-M-p") 'org-noter-sync-prev-page-or-chapter)
   (define-key org-noter-notes-mode-map (kbd "C-M-.") 'org-noter-sync-current-page-or-chapter)
   (define-key org-noter-notes-mode-map (kbd "C-M-n") 'org-noter-sync-next-page-or-chapter))
+
+(use-package org-roam
+  :ensure t
+  :custom
+  (org-roam-directory (file-truename "d:/fsz-org/"))
+  :bind (("C-c n l" . org-roam-buffer-toggle)
+         ("C-c n f" . org-roam-node-find)
+         ("C-c n g" . org-roam-graph)
+         ("C-c n i" . org-roam-node-insert)
+         ("C-c n c" . org-roam-capture)
+         ;; Dailies
+         ("C-c n j" . org-roam-dailies-capture-today))
+  :config
+  ;; If you're using a vertical completion framework, you might want a more informative completion interface
+  (setq org-roam-node-display-template (concat "${title:*} " (propertize "${tags:10}" 'face 'org-tag)))
+  (org-roam-db-autosync-mode)
+  ;; If using org-roam-protocol
+  (require 'org-roam-protocol))
+
+(use-package org-journal
+  :ensure t
+  :defer t
+  :init
+  ;; Change default prefix key; needs to be set before loading org-journal
+  (setq org-journal-prefix-key "C-c j ")
+  :config
+  (setq org-journal-dir "d:/fsz-org/journal"
+        org-journal-file-format "%Y-%m-%d.org"
+        org-journal-date-format "%A, %d %B %Y"
+        org-journal-file-type 'weekly))
+(defun org-journal-file-header-func (time)
+  "Custom function to create journal header."
+  (concat
+   (pcase org-journal-file-type
+     ('daily "#+TITLE: Daily Journal\n#+STARTUP: showeverything")
+     ('weekly "#+TITLE: Weekly Journal\n#+STARTUP: folded")
+     ('monthly "#+TITLE: Monthly Journal\n#+STARTUP: folded")
+     ('yearly "#+TITLE: Yearly Journal\n#+STARTUP: folded"))))
+(setq org-journal-file-header 'org-journal-file-header-func)
