@@ -467,8 +467,8 @@ If FRAME is omitted or nil, use currently selected frame."
   :config
   (setq org-journal-dir "d:/fsz-org/journal"
         org-journal-file-format "%Y-%m-%d.org"
-        org-journal-date-format "%A, %d %B %Y"
-        org-journal-file-type 'weekly))
+        org-journal-date-format "%Y-%m-%d %A"
+        org-journal-file-type 'daily))
 (defun org-journal-file-header-func (time)
   "Custom function to create journal header."
   (concat
