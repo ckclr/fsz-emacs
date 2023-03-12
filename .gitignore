@@ -10,3 +10,4 @@ eshell/
 *.html
 org-roam.db
 bookmarks
+custom.el

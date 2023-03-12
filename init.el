@@ -371,7 +371,8 @@ If FRAME is omitted or nil, use currently selected frame."
 (use-package async :ensure t)
 (add-to-list 'load-path "~/.emacs.d/site-lisp/org-download/")
 (require 'org-download)
-(setq-default org-download-image-dir "d:/fsz-org/assets")
+(setq-default org-download-image-dir "~/fsz-org/assets")
+(setq-default org-download-abbreviate-filename-function 'concat)
 
 (use-package pdf-tools
   :ensure t
@@ -443,7 +444,7 @@ If FRAME is omitted or nil, use currently selected frame."
 (use-package org-roam
   :ensure t
   :custom
-  (org-roam-directory (file-truename "d:/fsz-org/"))
+  (org-roam-directory (file-truename "~/fsz-org/"))
   :bind (("C-c n l" . org-roam-buffer-toggle)
          ("C-c n f" . org-roam-node-find)
          ("C-c n g" . org-roam-graph)
@@ -465,7 +466,7 @@ If FRAME is omitted or nil, use currently selected frame."
   ;; Change default prefix key; needs to be set before loading org-journal
   (setq org-journal-prefix-key "C-c j ")
   :config
-  (setq org-journal-dir "d:/fsz-org/journal"
+  (setq org-journal-dir "~/fsz-org/journal"
         org-journal-file-format "%Y-%m-%d.org"
         org-journal-date-format "%Y-%m-%d %A"
         org-journal-file-type 'daily))
@@ -478,3 +479,12 @@ If FRAME is omitted or nil, use currently selected frame."
      ('monthly "#+TITLE: Monthly Journal\n#+STARTUP: folded")
      ('yearly "#+TITLE: Yearly Journal\n#+STARTUP: folded"))))
 (setq org-journal-file-header 'org-journal-file-header-func)
+
+;; Enable plantuml-mode for PlantUML files
+(use-package plantuml-mode :ensure t)
+(add-to-list 'auto-mode-alist '("\\.plantuml\\'" . plantuml-mode))
+(add-to-list 'org-src-lang-modes '("plantuml" . plantuml))
+(setq plantuml-jar-path "~/plantuml.jar")
+(setq plantuml-default-exec-mode 'jar)
+(setq org-plantuml-jar-path (expand-file-name "~/plantuml.jar"))
+(org-babel-do-load-languages 'org-babel-load-languages '((plantuml . t)))
